@@ -1,0 +1,322 @@
+//Hong Tzu Yu 404410098	
+//Information Engerneering sophomore 
+//2017/4/9
+
+#include<cstdlib>
+#include<iostream>
+#include<ctime>
+#include<windows.h>
+using namespace std;
+
+void gotoxy(int xpos, int ypos)
+{
+  COORD scrn;
+  HANDLE hOuput = GetStdHandle(STD_OUTPUT_HANDLE);
+  scrn.X = xpos; scrn.Y = ypos;
+  SetConsoleCursorPosition(hOuput,scrn);
+}
+
+class gameOfLife
+{
+	public:
+		gameOfLife();
+		//pre: input width and height, default w=80 height=23
+		
+		void initialize();			
+		//pre: chose pattern 1~100
+
+		void preceed();				
+		//pre: chose generation
+
+		const int getw(){return w;}
+		//post: get width
+		const int geth(){return h;}		
+		//post: get hieght
+		const int gett(){return t;}		
+		//post: get generation
+		
+		void clearNow();			
+		//post: set all cell are dead right now
+		void clearFuture();			
+		//post: set all cell will dead in future
+		void goToFuture();			
+		//post: now=future
+		
+		void getPattern(int x,int y);
+		//post: according pattern number to get pattern
+		
+		int getNow(int x,int y){return now[x][y];}	
+		//pre: input location(x,y) of now_map
+		//post: get state of now(x,y)
+													
+		int getFuture(int x,int y){return future[x][y];}
+		//pre: input location(x,y) of future_map
+		//post: get stateof future(x,y)
+		
+		void changeNow(int x,int y);
+		//post:change state of now(x,y), '1' is live ,'0'is death
+		void changeFuture(int x,int y);
+		//post:change state of future(x,y), '1'live ,'0'death
+		
+		int neighbor(int x,int y);
+		//pre: input(x,y)
+		//post: get the number of neighbors
+		
+		void displayOriginal();
+		//post: show original now_map
+		void display();
+		//post: show now_map
+	private:
+		int w,h,p,t;
+		int now[258][258];
+		int future[258][258];
+};
+
+gameOfLife::gameOfLife()
+{
+	char ins='n';
+	w=80;h=23;
+	cout<<"Want to chose size of area? (Y/N) \n";
+	cin>>ins;
+	if(ins=='Y'||ins=='y')
+	{
+		cout<<"Enter wide   (16~256)\n";
+		cin>>w;
+		if(w<16||w>256)w=80;
+		cout<<"Enter height (16~256)\n";
+		cin>>h;
+		if(h<16||h>256)h=23;
+	}
+}
+void gameOfLife::initialize()
+{
+	cout<<"Chose pattern (1~100)\n";
+	cin>>p;
+	if (p>100||p<1)
+	{
+		cout<<"Pattern out of range\n";
+		exit(1);
+	}
+}
+void gameOfLife::preceed()
+{
+	char ins='n';
+	t=1;
+	cout<<"Want to chose generation? (Y/N) \n";
+	cin>>ins;
+	if(ins=='Y'||ins=='y')
+	{
+		cout<<"Chose generation (1~100)\n";
+		cin>>t;
+	}
+}
+void gameOfLife::getPattern(int x,int y)
+{
+	int n=0,a,b,need;
+	switch(p)
+	{
+		case 1:
+			now[x-1][y-1]=1;
+			now[x][y-1]=1;
+			now[x+1][y-1]=1;
+			now[x-1][y]=1;
+			now[x][y+1]=1;
+			break;
+		case 2:
+			now[x][y+1]=1;
+			now[x-1][y+1]=1;
+			now[x-2][y+1]=1;
+			now[x+1][y+1]=1;
+			now[x+2][y]=1;
+			now[x-2][y]=1;
+			now[x+2][y-2]=1;
+			now[x-2][y-1]=1;
+			now[x-1][y-2]=1;
+			break;
+		case 3:
+			now[x+3][y-6]=1;now[x-3][y-6]=1;
+			now[x+4][y-6]=1;now[x-4][y-6]=1;
+			
+			now[x+2][y-5]=1;now[x-2][y-5]=1;
+			now[x+3][y-5]=1;now[x-3][y-5]=1;
+			
+			now[x+1][y-4]=1;now[x-1][y-4]=1;
+			now[x+3][y-4]=1;now[x-3][y-4]=1;
+			now[x+6][y-4]=1;now[x-6][y-4]=1;
+			
+			now[x+1][y-3]=1;now[x-1][y-3]=1;
+			now[x+2][y-3]=1;now[x-2][y-3]=1;
+			now[x+4][y-3]=1;now[x-4][y-3]=1;
+			now[x+5][y-3]=1;now[x-5][y-3]=1;
+			now[x+6][y-3]=1;now[x-6][y-3]=1;
+			
+			now[x+1][y-2]=1;now[x-1][y-2]=1;
+			now[x+3][y-2]=1;now[x-3][y-2]=1;
+			now[x+5][y-2]=1;now[x-5][y-2]=1;
+			
+			now[x-2][y-1]=1;now[x+2][y-1]=1;
+			now[x-3][y-1]=1;now[x+3][y-1]=1;
+			now[x-4][y-1]=1;now[x+4][y-1]=1;
+			
+			now[x-2][y+1]=1;now[x+2][y+1]=1;
+			now[x-3][y+1]=1;now[x+3][y+1]=1;
+			now[x-4][y+1]=1;now[x+4][y+1]=1;
+			
+			now[x+1][y+2]=1;now[x-1][y+2]=1;
+			now[x+3][y+2]=1;now[x-3][y+2]=1;
+			now[x+5][y+2]=1;now[x-5][y+2]=1;
+			
+			now[x+1][y+3]=1;now[x-1][y+3]=1;
+			now[x+2][y+3]=1;now[x-2][y+3]=1;
+			now[x+4][y+3]=1;now[x-4][y+3]=1;
+			now[x+5][y+3]=1;now[x-5][y+3]=1;
+			now[x+6][y+3]=1;now[x-6][y+3]=1;
+			
+			now[x+1][y+4]=1;now[x-1][y+4]=1;
+			now[x+3][y+4]=1;now[x-3][y+4]=1;
+			now[x+6][y+4]=1;now[x-6][y+4]=1;
+			
+			now[x+2][y+5]=1;now[x-2][y+5]=1;
+			now[x+3][y+5]=1;now[x-3][y+5]=1;
+			
+			now[x+3][y+6]=1;now[x-3][y+6]=1;
+			now[x+4][y+6]=1;now[x-4][y+6]=1;
+			break;
+		case 4 ... 100:
+			srand(time(NULL));
+			need=(((float)p/100)*w*h);
+			while(n<need)
+			{
+				a=rand()%w+1;
+				b=rand()%h+1;
+				if(now[a][b]==0)
+				{
+					now[a][b]=1;
+					n++;
+				}
+			}
+			break;
+	}
+}
+void gameOfLife::clearNow()
+{
+	int i,j;
+	for(i=0;i<w+2;i++)
+		for(j=0;j<h+2;j++)
+			now[i][j]=0;
+}
+void gameOfLife::clearFuture()
+{
+	int i,j;
+	for(i=0;i<w+2;i++)
+		for(j=0;j<h+2;j++)
+			future[i][j]=0;
+}
+void gameOfLife::goToFuture()
+{
+	int i,j;
+	for(i=1;i<=w;i++)
+		for(j=1;j<=h;j++)
+			now[i][j]=future[i][j];
+}
+void gameOfLife::changeNow(int x,int y)
+{
+	if(now[x][y]==0)
+		now[x][y]=1;
+	else
+		now[x][y]=0;
+}
+void gameOfLife::changeFuture(int x,int y)
+{
+	if(future[x][y]==0)
+		future[x][y]=1;
+	else
+		future[x][y]=0;
+}
+int gameOfLife::neighbor(int x,int y)
+{
+	int count=0;
+	int i,j;
+	for(i=-1;i<2;i++)
+		for(j=-1;j<2;j++)
+			if((i!=0||j!=0)&&(now[x+i][y+j]==1))count ++;
+	return count;
+}
+void gameOfLife::displayOriginal()
+{
+	int x,y;
+	for(y=1;y<=h;y++)
+	{
+		for(x=1;x<=w;x++)
+		{
+			if(now[x][y])
+			{
+					gotoxy(x*2,y);
+					cout<<"■";
+					gotoxy(w,h);
+			} 
+		}
+	}
+}
+void gameOfLife::display()
+{
+	int x,y;
+	for(y=1;y<=h;y++)
+	{
+		for(x=1;x<=w;x++)
+		{
+			if(future[x][y]>now[x][y])
+			{
+					gotoxy(x*2,y);
+					cout<<"■";
+			} 
+			else if(future[x][y]<now[x][y])
+			{
+					gotoxy(x*2,y);
+					cout<<"　"; 
+			} 
+		}
+		gotoxy(w,h);
+	}
+}
+
+
+int main()
+{
+	int wide,height,generation,pattern,middle_w,middle_h;
+	int x,y,n;
+	
+	gameOfLife life;
+	life.initialize();
+	
+	life.preceed();
+	
+	life.clearNow();
+	life.clearFuture();
+	
+	system("cls");
+	middle_w=(life.getw()/2)+1;
+	middle_h=(life.geth()/2)+1;
+	wide=life.getw();
+	height=life.geth();
+	generation=life.gett();
+	
+	life.getPattern(middle_w,middle_h);
+	
+	life.displayOriginal();
+	while(generation--)
+	{
+		for(y=1;y<=height;y++)
+			for(x=1;x<=wide;x++)
+			{
+				n=life.neighbor(x,y);
+				if((n==2&&life.getNow(x,y)==1)||(n==3))
+							life.changeFuture(x,y);
+			}
+		life.display();
+		life.goToFuture();
+		for(n=0;n<100000000;n++);
+		life.clearFuture();
+	}
+	return 0;
+} 
