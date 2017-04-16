@@ -1,0 +1,160 @@
+#include<iostream>
+#include<cstdlib>
+#include<cstdio> 
+#include<iomanip>
+using namespace std;
+int inputYrMn(int year,int month);
+//1990<year<2100 month=>1~12.
+//return true when is is in range，false is out of range. 
+int get1stDayOfMonth(int year,int month);
+//input the year and month that calender you want to check,date is 
+//show the calender you wantto check
+int dayOfMonth(int year,int month);
+//input the year and month
+//return how many days in this mouth;
+int leapYear(int year);
+//input year you want to check for leap-year
+//return true if it's leap-year ,false while it's not
+void outputMn(int month);
+int main(void)
+{
+	int year, month;
+	int date;
+	int i;
+	char end;
+	while(1)
+	{
+	cin>>year>>month;
+	if (year==EOF)break;
+	if(inputYrMn(year,month)==false) break;
+	date=get1stDayOfMonth(year,month);
+	cout<<setw(15)<<year;
+	outputMn(month);
+	for(i=0;i<35;i++)cout<<"=";
+	cout<<endl;
+	cout<<"  SUN  MON  TUE  WED  THU  FRI  SAT"<<endl;
+	for(i=0;i<35;i++)cout<<"=";
+	cout<<endl;
+	for(i=0;i<date%7;i++)cout<<"     ";
+	for(i=1;i<=dayOfMonth(year,month);i++)
+		{
+			cout<<setw(5)<<i;
+			if((date+i)%7==0)cout<<endl;
+		}
+	cout<<endl<<endl;
+	cout<<"Want to countinue?\n"<<"Y/y\n";
+	cin>>end;
+	if(end!='Y'&&end!='y')break;
+	}
+	return 0;
+}
+int leapYear(int year)
+{
+	if((year%4<1)&&(year%100>0)||(year%400<1)) return true;
+	else return false;
+}
+int inputYrMn(int year,int month)
+{
+	if((year>2099)||(year<1901)||(month<1)||(month>12)) return false;
+	else return true;
+}
+int dayOfMonth(int year,int month)
+{
+	switch(month)
+			{
+				case 1:
+				case 3:
+				case 5:
+				case 7:
+				case 8:
+				case 10:
+				case 12:
+					return 31;
+					break;
+				case 2:
+					if(leapYear(year)) return 29;
+					else return 28;
+					break;
+				case 4:
+				case 6:
+				case 9:
+				case 11:
+					return 30;
+					break;
+			}
+}
+int get1stDayOfMonth(int year,int month)
+{
+	int const BENCHMARK=0;//2017-1
+	int date=BENCHMARK;
+	int count_year,count_month;
+	if(year>=2017)
+	{
+		for(count_year=2017;count_year<year;count_year++)
+		{
+			if(leapYear(count_year)) date+=366;
+			else date+=365;
+		}
+		for(count_month=1;count_month<month;count_month++)
+		{
+			date+=dayOfMonth(year,count_month);
+		}
+	}
+	else
+	{
+		for(count_year=2016;count_year>year;count_year--)
+		{
+			if(leapYear(count_year)) date-=366;
+			else date-=365;
+		}
+		for(count_month=12;count_month>=month;count_month--)
+		{
+			date-=dayOfMonth(year,count_month);
+		}
+		date=(date%7+7);
+	}
+	return date;
+}
+void outputMn(int month)
+{
+	switch(month)
+	{
+		case 1:
+			cout<<setw(10)<<"January";
+			break;
+		case 2:
+			cout<<setw(10)<<"February";
+			break;
+		case 3:
+			cout<<setw(10)<<"March";
+			break;
+		case 4:
+			cout<<setw(10)<<"April";
+			break;
+		case 5:
+			cout<<setw(10)<<"May";
+			break;
+		case 6:
+			cout<<setw(10)<<"June";
+			break;
+		case 7:
+			cout<<setw(10)<<"July";
+			break;
+		case 8:
+			cout<<setw(10)<<"August";
+			break;
+		case 9:
+			cout<<setw(10)<<"September";
+			break;
+		case 10:
+			cout<<setw(10)<<"October";
+			break;
+		case 11:
+			cout<<setw(10)<<"November";
+			break;
+		case 12:
+			cout<<setw(10)<<"December";
+			break;
+	}
+	cout<<endl;
+}
